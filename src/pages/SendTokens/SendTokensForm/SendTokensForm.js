@@ -237,6 +237,8 @@ const SendTokensForm = (props) => {
         onConfirm={handleConfirmSubmit}
         senderWallet={senderWallet}
         receiverWallet={receiverWallet}
+        tokensAmount={tokensAmountRef}
+
       />
     </>
   );
