@@ -4,7 +4,7 @@ import SelectWallet from './SelectWallet';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CloseIcon from '@mui/icons-material/Close';
 import { StyledBox, StyledButton } from './SendTokensFormStyled';
-import ConfirmDialog from './ConfirmDialog';
+import ConfirmDialog from './confirmDialog/ConfirmDialog';
 
 const SendTokensForm = (props) => {
   const {
@@ -235,6 +235,8 @@ const SendTokensForm = (props) => {
         open={showConfirmationDialog}
         onClose={handleConfirmationDialogClose}
         onConfirm={handleConfirmSubmit}
+        senderWallet={senderWallet}
+        receiverWallet={receiverWallet}
       />
     </>
   );
