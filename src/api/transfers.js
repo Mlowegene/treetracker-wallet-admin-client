@@ -4,6 +4,7 @@ import { makeQueryString } from '../utils/formatting';
 export const getTransfers = async (token, { pagination, filter }) => {
   try {
     const where = filter.getWhereObj();
+    console.log(where);
     // pagination: limit, offset
     // where: wallet, status, before, after (possible options)
     const transferFilter = {

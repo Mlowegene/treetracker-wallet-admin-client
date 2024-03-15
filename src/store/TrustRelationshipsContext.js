@@ -1,7 +1,7 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState} from 'react';
 import { getDateText } from '../utils/formatting';
-import AuthContext from './auth-context';
-import { getTrustRelationships } from '../api/trust_relationships';
+
+import TrustRelationshipsFilter from '../models/TrustRelationShipFilter';
 
 const TrustRelationshipsContext = createContext();
 
@@ -14,7 +14,16 @@ const TrustRelationshipsProvider = ({ children }) => {
   };
   const [pagination, setPagination] = useState(defaultPagination);
 
+  const [tableRows, setTableRows] = useState([]);
 
+  const [searchString, setSearchString] = useState('');
+
+  const defaultFilter = new TrustRelationshipsFilter({
+    state: '',
+    type: '',
+    requestType: ''
+  });
+  const [filter, setFilter] = useState(defaultFilter);
   // Loader
   const [isLoading, setIsLoading] = useState(false);
 
@@ -101,38 +110,89 @@ const TrustRelationshipsProvider = ({ children }) => {
 
 
 
-   // error
-   const [message, setMessage] = useState('');
-   // data to be displayed in the table
-   const [tableRows, setTableRows] = useState([]);
- 
- 
-   // total rows count for pagination
-   const [totalRowCount, setTotalRowCount] = useState(null);
- 
-   const authContext = useContext(AuthContext);
- 
- 
-   useEffect(() => {
-     const loadData = async () => {
-       try {
-         setIsLoading(true);
-         
-         const data = await getTrustRelationships(authContext.token, {pagination});
- 
-         const preparedRows = prepareRows(await data.trust_relationships);
-         setTableRows(preparedRows);
-         setTotalRowCount(data.total);
-         
-       } catch (error) {
-         console.error(error);
-         setMessage('An error occurred while fetching the table data');
-       }finally {
-         setIsLoading(false);
-        }
-     };
-     loadData();
-   }, [pagination]);
+
+   const statesList = [
+    {
+      label: 'Requested',
+      value: 'requested',
+      color: 'black',
+    },
+    {
+      label: 'Trusted',
+      value: 'truted',
+      color: 'black',
+    },
+    {
+      label: 'CancelledByOriginator',
+      value: 'cancelled_by_originator',
+      color: '#86C232',
+    },
+    {
+      label: 'CancelledByActor',
+      value: 'cancelled_by_actor',
+      color: 'red',
+    },
+    {
+      label: 'CancelledByTarget',
+      value: 'cancelled_by_target',
+      color: 'red',
+    },
+
+  ];
+
+  const requestTypeList = [
+      {
+        label: 'Manage',
+        value: 'manage',
+        color: 'black'
+      },
+      {
+        label: 'Send',
+        value: 'send',
+        color: 'black'
+      },
+      {
+        label: 'Deduct',
+        value: 'deduct',
+        color: 'black'
+      }
+  ]
+
+  const typeList = [
+    {
+      label: 'Manage',
+      value: 'manage',
+      color: 'black'
+    },
+    {
+      label: 'Send',
+      value: 'send',
+      color: 'black'
+    },
+    {
+      label: 'Receive',
+      value: 'receive',
+      color: 'black'
+    },
+    {
+      label: 'Deduct',
+      value: 'deduct',
+      color: 'black'
+    },
+    {
+      label: 'Release',
+      value: 'release',
+      color: 'black'
+    },
+    {
+      label: 'Yield',
+      value: 'yield',
+      color: 'black'
+    }
+]
+
+
+
 
 
 
@@ -140,12 +200,19 @@ const TrustRelationshipsProvider = ({ children }) => {
     pagination,
     setPagination,
     isLoading,
+    filter,
+    statesList,
+    requestTypeList,
+    typeList,
+    defaultFilter,
+    setFilter,
     setIsLoading,
     tableColumns,
-    message,
+    prepareRows,
+    searchString,
+    setSearchString,
     tableRows,
-    totalRowCount,
-    setMessage
+    setTableRows
   };
 
   return (

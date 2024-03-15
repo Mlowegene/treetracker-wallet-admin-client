@@ -13,6 +13,7 @@ const MenuItem = ({ open }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
   const { tableRows } = useTrustRelationshipsContext();
+  console.log(`TableRows ${tableRows}`)
 
   useEffect(() => {
       let count = 0;
@@ -24,7 +25,6 @@ const MenuItem = ({ open }) => {
       }
       setPendingCount(count);  
     }, [tableRows]);
-  console.log(tableRows);
   return (
     <>
       <LinkItem
@@ -56,7 +56,7 @@ const MenuItem = ({ open }) => {
         open={open}
       />
        {
-        pendingCount > 0 && open ?
+        !pendingCount > 0 && open ?
       <div style={{ display: 'flex', 
                     alignItems: 'center', 
                     backgroundColor: isHovered ? '#E1F2E89C' : 'transparent',
@@ -70,7 +70,7 @@ const MenuItem = ({ open }) => {
         itemIcon={<HandshakeIcon />}
         isActive={location.pathname === '/trust-relationship'}
         open={open}
-        pendingCount={pendingCount}
+        pendingCount='3'
       />
 
     </div>

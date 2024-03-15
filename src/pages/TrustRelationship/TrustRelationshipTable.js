@@ -11,11 +11,13 @@ import {
   Typography,
 } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
+import Menu from '@mui/material/Menu';
 import {
   CreateButton,
   SearchTextField,
   FilterButton,
 } from './TrustRelationship.styled';
+import { StateSelectFilter, TypeSelectFilter, RequestTypeSelectFilter, ResetButton } from './TrustRelationshipsFilters';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import SearchIcon from '@mui/icons-material/Search';
 import { Loader } from '../../components/UI/components/Loader/Loader';
@@ -25,7 +27,31 @@ import {
   TooltipStyled,
 } from '../MyTransfers/TransfersTable.styled';
 
-const TrustRelationshipTableHeader = ({ tableTitle }) => {
+const TrustRelationshipTableHeader = ({ tableTitle, getStatusColor }) => {
+
+  const { filter, 
+          setFilter, 
+          statesList, 
+          requestTypeList, 
+          typeList, 
+          defaultFilter,
+          searchString,
+          setSearchString 
+        } = useTrustRelationshipsContext();
+ 
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handleClick = (event) => {
+    setAnchorEl((prevAnchorEl) => (prevAnchorEl ? null : event.currentTarget));
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+
+  console.log(`Search ${searchString}`);
+
   return (
     <Grid item container sx={{ height: '5rem', marginBottom: '20px' }}>
       <Grid item xs={6} sx={{ display: 'flex', alignItems: 'start' }}>
@@ -52,6 +78,8 @@ const TrustRelationshipTableHeader = ({ tableTitle }) => {
         <SearchTextField
           variant="outlined"
           placeholder="Search by Wallet..."
+          onChange={(e) => setSearchString(e.target.value)}
+          value={searchString}
           InputProps={{
             style: { fontSize: '14px' },
             startAdornment: (
@@ -71,10 +99,64 @@ const TrustRelationshipTableHeader = ({ tableTitle }) => {
           alignItems: 'flex-end',
         }}
       >
-        <FilterButton type="button">
+        <FilterButton type="button" onClick={handleClick}>
           Filters
           <FilterListIcon style={{ color: '#86C232', marginLeft: '8px' }} />
         </FilterButton>
+        <Menu
+              anchorEl={anchorEl}
+              keepMounted
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+             
+            >
+        <Grid container direction="column"  sx={{ padding: '20px', }}>
+        <Grid item xs={5} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', }}>
+            <StateSelectFilter
+              filter={filter}
+              setFilter={setFilter}
+              statesList={statesList}
+              getStatusColor={getStatusColor}
+            />
+             <RequestTypeSelectFilter
+              filter={filter}
+              setFilter={setFilter}
+              requestTypeList={requestTypeList}
+              getStatusColor={getStatusColor}
+            />
+               <TypeSelectFilter
+              filter={filter}
+              setFilter={setFilter}
+              typeList={typeList}
+              getStatusColor={getStatusColor}
+            />
+        </Grid>
+        <Grid item xs={5} sx={{ display: 'flex', justifyContent: 'flex-end', paddingBottom: '20px' }}>
+          </Grid>
+          <Grid item xs={2} sx={{
+                                   display: 'flex', 
+                                   justifyContent: 'space-around', 
+                                   alignItems: 'center',
+                                   margin: '10px auto',
+                                   gap: '10px',
+
+                                   }}>
+            <ResetButton close={handleClose} setFilter={setFilter} defaultFilter={defaultFilter} />
+            <button
+              style={{ 
+                color: 'black',
+                border: 'none',
+                backgroundColor: 'rgba(114, 185, 7, 0.192)',
+                padding: '8px 20px',
+                borderRadius: '2rem',
+            }}
+            onClick={handleClose}
+            >
+             <h4> Apply</h4>
+            </button>
+          </Grid>    
+        </Grid>
+      </Menu>
       </Grid>
     </Grid>
   );
@@ -130,6 +212,8 @@ const TrustRelationshipTableBody = ({ tableColumns, tableRows }) => {
 
   // State to track the index of the selected row
   const [selectedRowIndex, setSelectedRowIndex] = useState(null);
+  const { searchString } = useTrustRelationshipsContext()
+
 
   // Function to handle row click
   const handleRowClick = (rowIndex) => {
@@ -162,7 +246,13 @@ const TrustRelationshipTableBody = ({ tableColumns, tableRows }) => {
   return (
     <TableBody>
       {sortedTableRows &&
-        sortedTableRows.map((row, rowIndex) => {
+        sortedTableRows
+        .filter(
+          (row) =>
+            row.actor_wallet?.toLowerCase().includes(searchString.toLowerCase()) ||
+            row.target_wallet?.toLowerCase().includes(searchString.toLowerCase())
+        )
+        .map((row, rowIndex) => {
           const isSelected = rowIndex === selectedRowIndex;
           return (
             <TableRow

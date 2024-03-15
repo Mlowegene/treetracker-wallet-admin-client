@@ -1,11 +1,13 @@
 import apiClient from '../utils/apiClient';
 import { makeQueryString } from '../utils/formatting';
 
-export const getTrustRelationships = async (token, {pagination}) => {
+export const getTrustRelationships = async (token, {pagination, filter}) => {
+
   try {
-    // const where = filter.getWhereObj();
+    const where = filter.getWhereObj();
     const trustRelationshipsFilter = {
       ...pagination,
+      ...where
     };
 
     const queryString = makeQueryString(trustRelationshipsFilter);
